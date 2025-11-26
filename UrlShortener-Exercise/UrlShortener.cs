@@ -5,6 +5,8 @@ namespace Com.Example.UrlShortener_Exercise;
 
 public class UrlShortener(IUrlMapDb urlMapDb)
 {
+    private readonly IUrlMapDb _urlMapDb = urlMapDb ?? throw new ArgumentNullException(nameof(urlMapDb));
+
     private const string Base62Characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private const string ShortUrlDomain = "eg.org";
     private const int MaxCollisionAttempts = 100;
@@ -14,8 +16,6 @@ public class UrlShortener(IUrlMapDb urlMapDb)
         Uri.UriSchemeHttps
     ];
     private static readonly string _supportedSchemesDisplay = string.Join(", ", SupportedSchemes);
-
-    private readonly IUrlMapDb _urlMapDb = urlMapDb ?? throw new ArgumentNullException(nameof(urlMapDb));
 
     public Uri ShortenUrl(Uri longUrl)
     {
@@ -75,17 +75,17 @@ public class UrlShortener(IUrlMapDb urlMapDb)
         return new Uri($"{longUrl.Scheme}://{ShortUrlDomain}/{shortCode}");
     }
 
-    private bool IsShortUrlAvailable(Uri shortUrl, Uri originalLongUrl)
-    {
-        string existingLongUrl = _urlMapDb.GetLongUrl(shortUrl.AbsoluteUri);
-        return string.IsNullOrEmpty(existingLongUrl)
-            || existingLongUrl == originalLongUrl.AbsoluteUri;
-    }
-
     private static string GenerateShortCode(string input)
         => new([
             .. SHA256.HashData(Encoding.UTF8.GetBytes(input))
                 .Take(8)
                 .Select(b => Base62Characters[b % Base62Characters.Length])
             ]);
+
+    private bool IsShortUrlAvailable(Uri shortUrl, Uri originalLongUrl)
+    {
+        string existingLongUrl = _urlMapDb.GetLongUrl(shortUrl.AbsoluteUri);
+        return string.IsNullOrEmpty(existingLongUrl)
+            || existingLongUrl == originalLongUrl.AbsoluteUri;
+    }
 }
