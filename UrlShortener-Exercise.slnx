@@ -3,5 +3,5 @@
     <File Path=".gitignore" />
   </Folder>
   <Project Path="UrlShortener-Exercise/UrlShortener-Exercise.csproj" />
-  <Project Path="UrlShortner-ExerciseTest/UrlShortner-ExerciseTest.csproj" Id="a3ed83e8-b7c4-44cf-8657-fad10c7c5981" />
+  <Project Path="UrlShortner-ExerciseTest/UrlShortner-Exercise.Test.csproj" Id="a3ed83e8-b7c4-44cf-8657-fad10c7c5981" />
 </Solution>
