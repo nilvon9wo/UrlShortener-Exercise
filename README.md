@@ -1,2 +1,5 @@
 # UrlShortener-Exercise
-A C# class library implementing a URL shortener with dependency-injected storage and unit tests.
+This repository contains a C# implementation of a URL shortener class with dependency-injected storage and unit tests.
+
+This project was created as a coding exercise submitted for a job application at Abacus Medicine.
+
