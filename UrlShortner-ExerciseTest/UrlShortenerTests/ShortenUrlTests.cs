@@ -54,11 +54,14 @@ public class ShortenUrlTests
         Uri validUri = new(uriString);
 
         // Act
-        string shortUrl = urlShortener.ShortenUrl(validUri);
+        Uri shortUrl = urlShortener.ShortenUrl(validUri);
 
         // Assert
-        Assert.NotEmpty(shortUrl);
-        mockDb.Verify(db => db.SaveUrlMapping(shortUrl, validUri.AbsoluteUri), Times.Once);
+        Assert.NotNull(shortUrl);
+        Assert.Equal(validUri.Scheme, shortUrl.Scheme);
+        Assert.Equal("eg.org", shortUrl.Host);
+        Assert.NotEmpty(shortUrl.AbsolutePath.TrimStart('/'));
+        mockDb.Verify(db => db.SaveUrlMapping(shortUrl.AbsoluteUri, validUri.AbsoluteUri), Times.Once);
     }
 
     [Fact]
@@ -70,8 +73,8 @@ public class ShortenUrlTests
         Uri uri = new("https://example.com");
 
         // Act
-        string shortUrl1 = urlShortener.ShortenUrl(uri);
-        string shortUrl2 = urlShortener.ShortenUrl(uri);
+        Uri shortUrl1 = urlShortener.ShortenUrl(uri);
+        Uri shortUrl2 = urlShortener.ShortenUrl(uri);
 
         // Assert
         Assert.Equal(shortUrl1, shortUrl2);
@@ -85,10 +88,47 @@ public class ShortenUrlTests
         UrlShortener urlShortener = new(mockDb.Object);
 
         // Act
-        string shortUrl1 = urlShortener.ShortenUrl(new Uri("https://example1.com"));
-        string shortUrl2 = urlShortener.ShortenUrl(new Uri("https://example2.com"));
+        Uri shortUrl1 = urlShortener.ShortenUrl(new Uri("https://example1.com"));
+        Uri shortUrl2 = urlShortener.ShortenUrl(new Uri("https://example2.com"));
 
         // Assert
         Assert.NotEqual(shortUrl1, shortUrl2);
+    }
+
+    [Theory]
+    [InlineData("http://example.com", "http")]
+    [InlineData("https://example.com", "https")]
+    public void ShortenUrl_PreservesSchemeFromOriginalUrl(string longUrlString, string expectedScheme)
+    {
+        // Arrange
+        Mock<IUrlMapDb> mockDb = new();
+        UrlShortener urlShortener = new(mockDb.Object);
+        Uri longUrl = new(longUrlString);
+
+        // Act
+        Uri shortUrl = urlShortener.ShortenUrl(longUrl);
+
+        // Assert
+        Assert.Equal(expectedScheme, shortUrl.Scheme);
+    }
+
+    [Theory]
+    [InlineData("http://example.com")]
+    [InlineData("https://secure.example.com")]
+    public void ShortenUrl_SavesOriginalSchemeInDatabase(string longUrlString)
+    {
+        // Arrange
+        Mock<IUrlMapDb> mockDb = new();
+        UrlShortener urlShortener = new(mockDb.Object);
+        Uri longUrl = new(longUrlString);
+
+        // Act
+        Uri shortUrl = urlShortener.ShortenUrl(longUrl);
+
+        // Assert
+        mockDb.Verify(db => db.SaveUrlMapping(
+            It.Is<string>(s => s.StartsWith(longUrl.Scheme)),
+            It.Is<string>(saved => saved.StartsWith(longUrl.Scheme))),
+            Times.Once);
     }
 }
