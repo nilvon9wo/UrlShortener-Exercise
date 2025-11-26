@@ -11,4 +11,6 @@ public class UrlShortenerSettings
         Uri.UriSchemeHttp,
         Uri.UriSchemeHttps
     };
+
+    public string SupportedSchemesDisplay => string.Join(", ", SupportedSchemes);
 }

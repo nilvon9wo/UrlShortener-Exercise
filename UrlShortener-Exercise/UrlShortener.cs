@@ -7,7 +7,6 @@ public class UrlShortener(IUrlMapDb urlMapDb, UrlShortenerSettings? settings = n
 {
     private readonly IUrlMapDb _urlMapDb = urlMapDb ?? throw new ArgumentNullException(nameof(urlMapDb));
     private readonly UrlShortenerSettings _settings = settings ?? new UrlShortenerSettings();
-    private readonly string _supportedSchemesDisplay = string.Join(", ", (settings ?? new UrlShortenerSettings()).SupportedSchemes);
 
     public Uri ShortenUrl(Uri longUrl)
     {
@@ -30,7 +29,7 @@ public class UrlShortener(IUrlMapDb urlMapDb, UrlShortenerSettings? settings = n
 
         if (!_settings.SupportedSchemes.Contains(longUrl.Scheme))
         {
-            throw new ArgumentException($"URL must use one of the supported schemes: {_supportedSchemesDisplay}.", nameof(longUrl));
+            throw new ArgumentException($"URL must use one of the supported schemes: {_settings.SupportedSchemesDisplay}.", nameof(longUrl));
         }
     }
 
