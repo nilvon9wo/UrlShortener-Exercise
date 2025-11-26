@@ -21,7 +21,7 @@ public class GetLongUrlTests
         Mock<IUrlMapDb> mockDb = new();
         Uri shortUrl = new("https://eg.org/abc123");
         string expectedLongUrl = "https://example.com/";
-        mockDb.Setup(db => db.GetLongUrl(shortUrl.AbsoluteUri))
+        _ = mockDb.Setup(db => db.GetLongUrl(shortUrl.AbsoluteUri))
             .Returns(expectedLongUrl);
         UrlShortener urlShortener = new(mockDb.Object);
 
@@ -38,7 +38,7 @@ public class GetLongUrlTests
         // Arrange
         Mock<IUrlMapDb> mockDb = new();
         Uri shortUrl = new("https://eg.org/nonexistent");
-        mockDb.Setup(db => db.GetLongUrl(shortUrl.AbsoluteUri)).Returns(string.Empty);
+        _ = mockDb.Setup(db => db.GetLongUrl(shortUrl.AbsoluteUri)).Returns(string.Empty);
         UrlShortener urlShortener = new(mockDb.Object);
 
         // Act & Assert
@@ -54,7 +54,7 @@ public class GetLongUrlTests
         // Arrange
         Mock<IUrlMapDb> mockDb = new();
         Uri shortUrl = new("https://eg.org/abc123");
-        mockDb.Setup(db => db.GetLongUrl(shortUrl.AbsoluteUri))
+        _ = mockDb.Setup(db => db.GetLongUrl(shortUrl.AbsoluteUri))
             .Returns(storedLongUrl);
         UrlShortener urlShortener = new(mockDb.Object);
 

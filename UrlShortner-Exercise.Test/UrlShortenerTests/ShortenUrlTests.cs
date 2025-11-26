@@ -23,7 +23,7 @@ public class ShortenUrlTests
         Uri relativeUri = new("/path/to/resource", UriKind.Relative);
 
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => urlShortener.ShortenUrl(relativeUri));
+        _ = Assert.Throws<ArgumentException>(() => urlShortener.ShortenUrl(relativeUri));
     }
 
     [Theory]
@@ -38,7 +38,7 @@ public class ShortenUrlTests
         Uri uri = new(uriString);
 
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => urlShortener.ShortenUrl(uri));
+        _ = Assert.Throws<ArgumentException>(() => urlShortener.ShortenUrl(uri));
     }
 
     [Theory]
@@ -50,7 +50,7 @@ public class ShortenUrlTests
     {
         // Arrange
         Mock<IUrlMapDb> mockDb = new();
-        mockDb.Setup(db => db.GetLongUrl(It.IsAny<string>())).Returns(string.Empty);
+        _ = mockDb.Setup(db => db.GetLongUrl(It.IsAny<string>())).Returns(string.Empty);
         UrlShortener urlShortener = new(mockDb.Object);
         Uri validUri = new(uriString);
 
@@ -70,7 +70,7 @@ public class ShortenUrlTests
     {
         // Arrange
         Mock<IUrlMapDb> mockDb = new();
-        mockDb.Setup(db => db.GetLongUrl(It.IsAny<string>())).Returns(string.Empty);
+        _ = mockDb.Setup(db => db.GetLongUrl(It.IsAny<string>())).Returns(string.Empty);
         UrlShortener urlShortener = new(mockDb.Object);
         Uri uri = new("https://example.com");
 
@@ -87,7 +87,7 @@ public class ShortenUrlTests
     {
         // Arrange
         Mock<IUrlMapDb> mockDb = new();
-        mockDb.Setup(db => db.GetLongUrl(It.IsAny<string>())).Returns(string.Empty);
+        _ = mockDb.Setup(db => db.GetLongUrl(It.IsAny<string>())).Returns(string.Empty);
         UrlShortener urlShortener = new(mockDb.Object);
 
         // Act
@@ -105,7 +105,7 @@ public class ShortenUrlTests
     {
         // Arrange
         Mock<IUrlMapDb> mockDb = new();
-        mockDb.Setup(db => db.GetLongUrl(It.IsAny<string>())).Returns(string.Empty);
+        _ = mockDb.Setup(db => db.GetLongUrl(It.IsAny<string>())).Returns(string.Empty);
         UrlShortener urlShortener = new(mockDb.Object);
         Uri longUrl = new(longUrlString);
 
@@ -123,7 +123,7 @@ public class ShortenUrlTests
     {
         // Arrange
         Mock<IUrlMapDb> mockDb = new();
-        mockDb.Setup(db => db.GetLongUrl(It.IsAny<string>())).Returns(string.Empty);
+        _ = mockDb.Setup(db => db.GetLongUrl(It.IsAny<string>())).Returns(string.Empty);
         UrlShortener urlShortener = new(mockDb.Object);
         Uri longUrl = new(longUrlString);
 
@@ -145,7 +145,7 @@ public class ShortenUrlTests
         string existingLongUrl = "https://existing.com/";
 
         // First call to GetLongUrl returns collision, subsequent calls return empty
-        mockDb.SetupSequence(db => db.GetLongUrl(It.IsAny<string>()))
+        _ = mockDb.SetupSequence(db => db.GetLongUrl(It.IsAny<string>()))
             .Returns(existingLongUrl)
             .Returns(string.Empty);
 
@@ -168,12 +168,12 @@ public class ShortenUrlTests
         Uri longUrl = new("https://example.com/");
 
         // First call: generate and save the short URL
-        mockDb.Setup(db => db.GetLongUrl(It.IsAny<string>())).Returns(string.Empty);
+        _ = mockDb.Setup(db => db.GetLongUrl(It.IsAny<string>())).Returns(string.Empty);
         UrlShortener urlShortener = new(mockDb.Object);
         Uri firstShortUrl = urlShortener.ShortenUrl(longUrl);
 
         // Second call: simulate that this short URL already maps to the same long URL
-        mockDb.Setup(db => db.GetLongUrl(firstShortUrl.AbsoluteUri))
+        _ = mockDb.Setup(db => db.GetLongUrl(firstShortUrl.AbsoluteUri))
             .Returns(longUrl.AbsoluteUri);
 
         // Act
