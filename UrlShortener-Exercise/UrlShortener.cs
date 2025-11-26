@@ -8,6 +8,11 @@ public class UrlShortener(IUrlMapDb urlMapDb)
     private readonly IUrlMapDb _urlMapDb = urlMapDb ?? throw new ArgumentNullException(nameof(urlMapDb));
 
     private const string Base62Characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private static readonly HashSet<string> SupportedSchemes = [
+        Uri.UriSchemeHttp,
+        Uri.UriSchemeHttps
+    ];
+    private static readonly string supportedSchemesDisplay = string.Join(", ", SupportedSchemes);
 
     public string ShortenUrl(Uri longUrl)
     {
@@ -18,9 +23,9 @@ public class UrlShortener(IUrlMapDb urlMapDb)
             throw new ArgumentException("URL must be an absolute URI.", nameof(longUrl));
         }
 
-        if (longUrl.Scheme != Uri.UriSchemeHttp && longUrl.Scheme != Uri.UriSchemeHttps)
+        if (!SupportedSchemes.Contains(longUrl.Scheme))
         {
-            throw new ArgumentException("URL must use HTTP or HTTPS scheme.", nameof(longUrl));
+            throw new ArgumentException($"URL must use one of the supported schemes: {supportedSchemesDisplay}.", nameof(longUrl));
         }
 
         string shortUrl = GenerateShortUrl(longUrl.AbsoluteUri);
