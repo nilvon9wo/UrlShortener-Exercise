@@ -58,7 +58,7 @@ public class ShortenUrlTests
 
         // Assert
         Assert.NotEmpty(shortUrl);
-        mockDb.Verify(db => db.SaveUrlMapping(shortUrl, uriString), Times.Once);
+        mockDb.Verify(db => db.SaveUrlMapping(shortUrl, validUri.AbsoluteUri), Times.Once);
     }
 
     [Fact]
