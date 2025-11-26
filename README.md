@@ -1,61 +1,57 @@
 # URL Shortener in C#
 
-This repository contains a C# implementation of a URL shortener class with dependency-injected storage and unit tests.
-
----
-
-## Overview
-
-The `UrlShortener` class provides functionality to:
-
-- Shorten a given long URL into a unique short URL.
-- Retrieve the original long URL from a previously generated short URL.
-- Validate inputs and handle errors appropriately.
-- Store URL mappings using a database interface (`IUrlMapDb`), which is injected via dependency injection.
-
-An in-memory implementation of `IUrlMapDb` is included for demonstration and testing purposes.
+A C# implementation of a URL shortener with dependency injection, comprehensive validation, and collision-resistant hash-based short URL generation.
 
 ---
 
 ## Context
 
-This project was created as a **coding exercise submitted for a job application**. The exercise focuses on:
-
-- Implementing a small, testable C# class library.
-- Using dependency injection.
-- Writing unit tests (preferably following Test-Driven Development principles).
-
----
-
-## Project Structure
-
-The solution contains a class library project (`UrlShortener`) in `src/` and an xUnit test project (`UrlShortener.Tests`) in `tests/`. 
-The test project references the class library.
+This project was created as a **coding exercise for a job application**. The exercise focuses on:
+- Implementing a testable C# class library
+- Using dependency injection
+- Following Test-Driven Development principles
 
 ---
+
+## Quick Start
 
 ## Running the Tests
-
-1. Open the solution in Visual Studio or VS Code.
-2. Build the solution.
-3. Run the unit tests via Test Explorer or the command line:
 
 ```bash
 dotnet test
 ```
 
-All tests should pass and cover:
-- Shortening URLs
-- Retrieving long URLs from short URLs
-- Input validation
-- Collision handling (if implemented)
+All tests pass, covering URL shortening/retrieval, input validation, collision handling, and configuration options.
 
---- 
 
-## Notes
+## Key Design Decisions
 
-- The project uses a simple in-memory storage (`InMemoryUrlMapDb`) to keep the implementation self-contained.
-- For production, a real persistent storage could be used.
-- Input validation includes checking for null, empty, or invalid URLs.
-- Optional: The short URL generation ensures uniqueness and can be extended to handle collisions more robustly.
+### Type-Safe Public API
+
+The `UrlShortener` public API uses `System.Uri` instead of strings for type safety and built-in validation, while the required `IUrlMapDb` interface uses strings internally (as specified in requirements). This separation provides:
+- Type safety at the API boundary
+- Simple string-based storage
+- Clear architectural boundaries
+
+### Hash-Based Short URLs
+
+- **Deterministic** - Same long URL always produces the same short URL
+- **Collision-resistant** - SHA256 with 8-byte codes (~218 trillion combinations)
+- **Automatic retry** - Salt counter handles rare collisions
+
+### Configurable
+
+Optional `UrlShortenerSettings` allows customization of domain, code length, retry attempts, and supported schemes while maintaining sensible defaults.
+
+---
+
+## Implementation Highlights
+
+- ✅ Dependency injection via constructor
+- ✅ Comprehensive input validation with custom exceptions
+- ✅ Scheme preservation (HTTP stays HTTP, HTTPS stays HTTPS)
+- ✅ LINQ-based functional approach
+- ✅ Clean separation of concerns (public API vs internal implementation)
+- ✅ 100% test coverage of public API
+
 
