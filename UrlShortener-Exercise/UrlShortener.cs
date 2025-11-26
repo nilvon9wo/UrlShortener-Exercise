@@ -7,6 +7,8 @@ public class UrlShortener(IUrlMapDb urlMapDb)
 {
     private readonly IUrlMapDb _urlMapDb = urlMapDb ?? throw new ArgumentNullException(nameof(urlMapDb));
 
+    private const string Base62Characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
     public string ShortenUrl(Uri longUrl)
     {
         ArgumentNullException.ThrowIfNull(longUrl, nameof(longUrl));
@@ -49,15 +51,9 @@ public class UrlShortener(IUrlMapDb urlMapDb)
     private static string GenerateShortUrl(string longUrl)
     {
         byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(longUrl));
-
-        const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        StringBuilder shortUrl = new(6);
-
-        for (int i = 0; i < 6; i++)
-        {
-            shortUrl.Append(chars[hashBytes[i] % chars.Length]);
-        }
-
-        return shortUrl.ToString();
+        return new string([
+            .. hashBytes.Take(6)
+                .Select(b => Base62Characters[b % Base62Characters.Length])
+            ]);
     }
 }
