@@ -53,11 +53,9 @@ public class UrlShortener(IUrlMapDb urlMapDb)
     }
 
     private static string GenerateShortCode(string longUrl)
-    {
-        byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(longUrl));
-        return new string([
-            .. hashBytes.Take(6)
+        => new([
+            .. SHA256.HashData(Encoding.UTF8.GetBytes(longUrl))
+                .Take(6)
                 .Select(b => Base62Characters[b % Base62Characters.Length])
             ]);
-    }
 }
