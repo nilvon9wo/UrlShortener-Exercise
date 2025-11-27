@@ -183,4 +183,33 @@ public class ShortenUrlTests
         Assert.Equal(firstShortUrl, secondShortUrl);
         mockDb.Verify(db => db.SaveUrlMapping(It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(2));
     }
+
+    [Fact]
+    public void ShortenUrl_WhenCollisionOnFirstAttempt_ReturnsSameSaltedShortUrlOnRetry()
+    {
+        // Arrange
+        Mock<IUrlMapDb> mockDb = new();
+        Uri longUrl = new("https://example.com/");
+        string collidingUrl = "https://collision.com/";
+
+        // Simulate: First call has collision on attempt 0, succeeds on attempt 1
+        // Second call: Same collision pattern should produce same result
+        mockDb.SetupSequence(db => db.GetLongUrl(It.IsAny<string>()))
+            // First ShortenUrl call
+            .Returns(collidingUrl)  // Attempt 0: collision
+            .Returns(string.Empty)  // Attempt 1: success
+                                    // Second ShortenUrl call
+            .Returns(collidingUrl)  // Attempt 0: collision (same)
+            .Returns(longUrl.AbsoluteUri); // Attempt 1: finds our previously saved URL
+
+        UrlShortener urlShortener = new(mockDb.Object);
+
+        // Act
+        Uri firstShortUrl = urlShortener.ShortenUrl(longUrl);
+        Uri secondShortUrl = urlShortener.ShortenUrl(longUrl);
+
+        // Assert
+        Assert.Equal(firstShortUrl, secondShortUrl);
+        mockDb.Verify(db => db.GetLongUrl(It.IsAny<string>()), Times.Exactly(4)); // 2 attempts × 2 calls
+    }
 }
