@@ -52,6 +52,8 @@ public class UrlShortener(IUrlMapDb urlMapDb, UrlShortenerSettings? settings = n
         return new Uri($"{longUrl.Scheme}://{_settings.ShortUrlDomain}/{shortCode}");
     }
 
+    // Note: Modulo operation introduces minor bias (256 % 62 = 8), slightly favoring the first 8 characters.
+    // This bias is negligible for URL shortening purposes and outweighed by the simplicity of the implementation.
     private string GenerateShortCode(string input)
         => new([
             .. SHA256.HashData(Encoding.UTF8.GetBytes(input))
