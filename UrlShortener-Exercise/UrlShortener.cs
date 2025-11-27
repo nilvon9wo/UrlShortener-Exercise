@@ -75,9 +75,14 @@ public class UrlShortener(IUrlMapDb urlMapDb, UrlShortenerSettings? settings = n
 
         string longUrl = _urlMapDb.GetLongUrl(shortUrl.AbsoluteUri);
 
-        if (string.IsNullOrEmpty(longUrl))
+        if (string.IsNullOrWhiteSpace(longUrl))
         {
             throw new ShortUrlNotFoundException(shortUrl.AbsoluteUri);
+        }
+
+        if (!Uri.TryCreate(longUrl, UriKind.Absolute, out Uri? uri))
+        {
+            throw new InvalidOperationException("Stored long URL is invalid.");
         }
 
         return new Uri(longUrl);
