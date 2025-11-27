@@ -1,6 +1,6 @@
 namespace Com.Example.UrlShortener_Exercise;
 
-public class UrlShortenerSettings
+public record UrlShortenerSettings
 {
     public string Base62Characters { get; init; } = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     public string ShortUrlDomain { get; init; } = "eg.org";
