@@ -16,7 +16,7 @@ public record UrlShortenerSettings
     public int ShortCodeLength { get; init; } = 8;
     public int MaxCollisionAttempts { get; init; } = 100;
 
-    public IReadOnlySet<string> SupportedSchemes { get; init; } = new HashSet<string>
+    public IReadOnlySet<string> SupportedSchemes { get; init; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
     {
         Uri.UriSchemeHttp,
         Uri.UriSchemeHttps

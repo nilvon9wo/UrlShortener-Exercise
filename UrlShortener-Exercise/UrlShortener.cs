@@ -68,7 +68,7 @@ public class UrlShortener(IUrlMapDb urlMapDb, UrlShortenerSettings? settings = n
     {
         string existingLongUrl = _urlMapDb.GetLongUrl(shortUrl.AbsoluteUri);
         return string.IsNullOrEmpty(existingLongUrl)
-            || existingLongUrl == originalLongUrl.AbsoluteUri;
+            || existingLongUrl.Equals(originalLongUrl.AbsoluteUri, StringComparison.Ordinal);
     }
 
     public Uri GetLongUrl(Uri shortUrl)

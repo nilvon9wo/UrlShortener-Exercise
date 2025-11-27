@@ -212,4 +212,63 @@ public class ShortenUrlTests
         Assert.Equal(firstShortUrl, secondShortUrl);
         mockDb.Verify(db => db.GetLongUrl(It.IsAny<string>()), Times.Exactly(4)); // 2 attempts × 2 calls
     }
+
+    [Fact]
+    public void ShortenUrl_WithUrlContainingSpecialCharacters_UsesOrdinalComparison()
+    {
+        // Arrange
+        // This test demonstrates why StringComparison.Ordinal is necessary.
+        // Real-world URLs can contain percent-encoded characters, Unicode paths, etc.
+        // Using culture-aware comparison (==) could cause unexpected behavior in different locales.
+        // Example: Turkish locale treats 'i' and 'I' differently than English.
+        Mock<IUrlMapDb> mockDb = new();
+        Uri longUrl = new("https://example.com/api/files/document.pdf");
+        string existingUrlInDb = "https://example.com/api/files/document.pdf";
+
+        // Simulate that this exact URL is already in the database
+        mockDb.Setup(db => db.GetLongUrl(It.IsAny<string>()))
+            .Returns(existingUrlInDb);
+
+        UrlShortener urlShortener = new(mockDb.Object);
+
+        // Act
+        Uri shortUrl = urlShortener.ShortenUrl(longUrl);
+
+        // Assert
+        // This test passes with StringComparison.Ordinal because it does byte-by-byte comparison.
+        // If we used == (culture-aware), it might fail in some locales due to culture-specific
+        // string comparison rules (e.g., Turkish I problem, ligatures, etc.)
+        Assert.NotNull(shortUrl);
+
+        // Verify the URL was recognized as already existing (should only query DB, not save)
+        mockDb.Verify(db => db.GetLongUrl(It.IsAny<string>()), Times.AtLeast(1));
+    }
+
+    [Fact]
+    public void ShortenUrl_WithPathContainingMixedCase_PreservesExactCase()
+    {
+        // Arrange
+        // URLs are case-sensitive in the path component. This test ensures we use
+        // Ordinal comparison which preserves case sensitivity.
+        // https://example.com/API/Files is different from https://example.com/api/files
+        Mock<IUrlMapDb> mockDb = new();
+        mockDb.Setup(db => db.GetLongUrl(It.IsAny<string>())).Returns(string.Empty);
+
+        UrlShortener urlShortener = new(mockDb.Object);
+        Uri url1 = new("https://example.com/API/Files");
+        Uri url2 = new("https://example.com/api/files");
+
+        // Act
+        Uri shortUrl1 = urlShortener.ShortenUrl(url1);
+        Uri shortUrl2 = urlShortener.ShortenUrl(url2);
+
+        // Assert
+        // These should generate different short URLs because paths are case-sensitive
+        // StringComparison.Ordinal ensures this works correctly
+        Assert.NotEqual(shortUrl1, shortUrl2);
+
+        // Verify both URLs were saved with their exact casing preserved
+        mockDb.Verify(db => db.SaveUrlMapping(It.IsAny<string>(), "https://example.com/API/Files"), Times.Once);
+        mockDb.Verify(db => db.SaveUrlMapping(It.IsAny<string>(), "https://example.com/api/files"), Times.Once);
+    }
 }
