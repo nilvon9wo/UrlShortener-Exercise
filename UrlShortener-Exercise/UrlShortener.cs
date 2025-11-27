@@ -59,6 +59,9 @@ public class UrlShortener(IUrlMapDb urlMapDb, UrlShortenerSettings? settings = n
                 .Select(b => _settings.Base62Characters[b % _settings.Base62Characters.Length])
             ]);
 
+    // Note: Deterministic hashing ensures the same long URL always generates the same short URL,
+    // providing implicit idempotency without requiring a reverse lookup method in IUrlMapDb.
+    // This keeps the interface simple while avoiding unnecessary database queries.
     private bool IsShortUrlAvailable(Uri shortUrl, Uri originalLongUrl)
     {
         string existingLongUrl = _urlMapDb.GetLongUrl(shortUrl.AbsoluteUri);
