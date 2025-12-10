@@ -50,4 +50,5 @@ This approach keeps the core `UrlShortener` class simple, testable, and maintain
 ---
 
 For an overview of the class relationships, see the [Class Diagram](class-diagram.md).  
-For the `ShortenUrl` flow, see the [Sequence Diagram](shorten-sequence.md).
+For the `ShortenUrl` flow, see the [Sequence Diagram](shortenurl-sequence.md).
+For the `GetLongUrl` flow, see the [GetLongUrl Sequence Diagram](getlongurl-sequence.md).
