@@ -52,6 +52,8 @@ public class UrlShortener(IUrlMapDb urlMapDb, UrlShortenerSettings? settings = n
         return new Uri($"{longUrl.Scheme}://{_settings.ShortUrlDomain}/{shortCode}");
     }
 
+    // Note: Modulo operation introduces minor bias (256 % 62 = 8), slightly favoring the first 8 characters.
+    // This bias is negligible for URL shortening purposes and outweighed by the simplicity of the implementation.
     private string GenerateShortCode(string input)
         => new([
             .. SHA256.HashData(Encoding.UTF8.GetBytes(input))
@@ -59,11 +61,14 @@ public class UrlShortener(IUrlMapDb urlMapDb, UrlShortenerSettings? settings = n
                 .Select(b => _settings.Base62Characters[b % _settings.Base62Characters.Length])
             ]);
 
+    // Note: Deterministic hashing ensures the same long URL always generates the same short URL,
+    // providing implicit idempotency without requiring a reverse lookup method in IUrlMapDb.
+    // This keeps the interface simple while avoiding unnecessary database queries.
     private bool IsShortUrlAvailable(Uri shortUrl, Uri originalLongUrl)
     {
         string existingLongUrl = _urlMapDb.GetLongUrl(shortUrl.AbsoluteUri);
         return string.IsNullOrEmpty(existingLongUrl)
-            || existingLongUrl == originalLongUrl.AbsoluteUri;
+            || existingLongUrl.Equals(originalLongUrl.AbsoluteUri, StringComparison.Ordinal);
     }
 
     public Uri GetLongUrl(Uri shortUrl)
@@ -72,9 +77,14 @@ public class UrlShortener(IUrlMapDb urlMapDb, UrlShortenerSettings? settings = n
 
         string longUrl = _urlMapDb.GetLongUrl(shortUrl.AbsoluteUri);
 
-        if (string.IsNullOrEmpty(longUrl))
+        if (string.IsNullOrWhiteSpace(longUrl))
         {
             throw new ShortUrlNotFoundException(shortUrl.AbsoluteUri);
+        }
+
+        if (!Uri.TryCreate(longUrl, UriKind.Absolute, out Uri? uri))
+        {
+            throw new InvalidOperationException("Stored long URL is invalid.");
         }
 
         return new Uri(longUrl);
