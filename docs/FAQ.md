@@ -48,3 +48,6 @@ For example, a business could implement:
 This approach keeps the core `UrlShortener` class simple, testable, and maintainable, while enabling business-driven extensions and real-world consumption in a controlled, flexible way.
 
 ---
+
+For an overview of the class relationships, see the [Class Diagram](class-diagram.md).  
+For the `ShortenUrl` flow, see the [Sequence Diagram](shorten-sequence.md).
