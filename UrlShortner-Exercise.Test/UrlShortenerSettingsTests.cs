@@ -1,13 +1,10 @@
 namespace Com.Example.UrlShortener_Exercise.Tests;
 
-public class UrlShortenerSettingsTests
-{
+public class UrlShortenerSettingsTests {
     [Fact]
-    public void ShortUrlDomain_WithTrailingSlash_AutomaticallyRemovesIt()
-    {
+    public void ShortUrlDomain_WithTrailingSlash_AutomaticallyRemovesIt() {
         // Arrange & Act
-        UrlShortenerSettings settings = new()
-        {
+        UrlShortenerSettings settings = new() {
             ShortUrlDomain = "custom.com/"
         };
 
@@ -16,11 +13,9 @@ public class UrlShortenerSettingsTests
     }
 
     [Fact]
-    public void ShortUrlDomain_WithMultipleTrailingSlashes_RemovesAll()
-    {
+    public void ShortUrlDomain_WithMultipleTrailingSlashes_RemovesAll() {
         // Arrange & Act
-        UrlShortenerSettings settings = new()
-        {
+        UrlShortenerSettings settings = new() {
             ShortUrlDomain = "custom.com///"
         };
 

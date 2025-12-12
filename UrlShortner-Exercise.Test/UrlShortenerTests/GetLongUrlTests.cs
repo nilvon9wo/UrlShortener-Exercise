@@ -1,10 +1,8 @@
 namespace Com.Example.UrlShortener_Exercise.Tests.UrlShortenerTests;
 
-public class GetLongUrlTests
-{
+public class GetLongUrlTests {
     [Fact]
-    public void GetLongUrl_WithNullShortUrl_ThrowsArgumentNullException()
-    {
+    public void GetLongUrl_WithNullShortUrl_ThrowsArgumentNullException() {
         // Arrange
         Mock<IUrlMapDb> mockDb = new();
         UrlShortener urlShortener = new(mockDb.Object);
@@ -15,8 +13,7 @@ public class GetLongUrlTests
     }
 
     [Fact]
-    public void GetLongUrl_WithValidShortUrl_ReturnsLongUrl()
-    {
+    public void GetLongUrl_WithValidShortUrl_ReturnsLongUrl() {
         // Arrange
         Mock<IUrlMapDb> mockDb = new();
         Uri shortUrl = new("https://eg.org/abc123");
@@ -33,8 +30,7 @@ public class GetLongUrlTests
     }
 
     [Fact]
-    public void GetLongUrl_WithNonExistentShortUrl_ThrowsShortUrlNotFoundException()
-    {
+    public void GetLongUrl_WithNonExistentShortUrl_ThrowsShortUrlNotFoundException() {
         // Arrange
         Mock<IUrlMapDb> mockDb = new();
         Uri shortUrl = new("https://eg.org/nonexistent");
@@ -49,8 +45,7 @@ public class GetLongUrlTests
     [Theory]
     [InlineData("http://example.com/", "http")]
     [InlineData("https://secure.example.com/", "https")]
-    public void GetLongUrl_PreservesOriginalScheme(string storedLongUrl, string expectedScheme)
-    {
+    public void GetLongUrl_PreservesOriginalScheme(string storedLongUrl, string expectedScheme) {
         // Arrange
         Mock<IUrlMapDb> mockDb = new();
         Uri shortUrl = new("https://eg.org/abc123");
@@ -76,8 +71,7 @@ public class GetLongUrlTests
     [InlineData("http://")]
     [InlineData("://missing-scheme")]
     [InlineData("http:///no-host")]
-    public void GetLongUrl_WithInvalidUrlStoredInDatabase_ThrowsInvalidOperationException(string invalidStoredUrl)
-    {
+    public void GetLongUrl_WithInvalidUrlStoredInDatabase_ThrowsInvalidOperationException(string invalidStoredUrl) {
         // Arrange
         Mock<IUrlMapDb> mockDb = new();
         Uri shortUrl = new("https://eg.org/abc123");
@@ -91,8 +85,7 @@ public class GetLongUrlTests
     }
 
     [Fact]
-    public void GetLongUrl_WithRelativeUrlStoredInDatabase_ThrowsInvalidOperationException()
-    {
+    public void GetLongUrl_WithRelativeUrlStoredInDatabase_ThrowsInvalidOperationException() {
         // Arrange
         Mock<IUrlMapDb> mockDb = new();
         Uri shortUrl = new("https://eg.org/abc123");
@@ -110,8 +103,7 @@ public class GetLongUrlTests
     [InlineData("   ")]
     [InlineData("\t")]
     [InlineData("\n")]
-    public void GetLongUrl_WithWhitespaceStoredInDatabase_ThrowsShortUrlNotFoundException(string whitespace)
-    {
+    public void GetLongUrl_WithWhitespaceStoredInDatabase_ThrowsShortUrlNotFoundException(string whitespace) {
         // Arrange
         Mock<IUrlMapDb> mockDb = new();
         Uri shortUrl = new("https://eg.org/abc123");
@@ -129,8 +121,7 @@ public class GetLongUrlTests
     [InlineData("file:///c:/temp/file.txt", "file")]
     [InlineData("mailto:test@example.com", "mailto")]
     [InlineData("custom://valid-but-unusual/", "custom")]
-    public void GetLongUrl_WithNonHttpSchemeStoredInDatabase_ReturnsNormalizedUrl(string storedUrl, string expectedScheme)
-    {
+    public void GetLongUrl_WithNonHttpSchemeStoredInDatabase_ReturnsNormalizedUrl(string storedUrl, string expectedScheme) {
         // Arrange
         Mock<IUrlMapDb> mockDb = new();
         Uri shortUrl = new("https://eg.org/abc123");

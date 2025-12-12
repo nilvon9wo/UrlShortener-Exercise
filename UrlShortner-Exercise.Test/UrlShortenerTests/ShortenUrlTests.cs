@@ -1,10 +1,8 @@
 namespace Com.Example.UrlShortener_Exercise.Tests.UrlShortenerTests;
 
-public class ShortenUrlTests
-{
+public class ShortenUrlTests {
     [Fact]
-    public void ShortenUrl_WithNullUrl_ThrowsArgumentNullException()
-    {
+    public void ShortenUrl_WithNullUrl_ThrowsArgumentNullException() {
         // Arrange
         Mock<IUrlMapDb> mockDb = new();
         UrlShortener urlShortener = new(mockDb.Object);
@@ -15,8 +13,7 @@ public class ShortenUrlTests
     }
 
     [Fact]
-    public void ShortenUrl_WithRelativeUri_ThrowsArgumentException()
-    {
+    public void ShortenUrl_WithRelativeUri_ThrowsArgumentException() {
         // Arrange
         Mock<IUrlMapDb> mockDb = new();
         UrlShortener urlShortener = new(mockDb.Object);
@@ -30,8 +27,7 @@ public class ShortenUrlTests
     [InlineData("ftp://unsupported.com")]
     [InlineData("file:///c:/temp/file.txt")]
     [InlineData("mailto:test@example.com")]
-    public void ShortenUrl_WithNonHttpScheme_ThrowsArgumentException(string uriString)
-    {
+    public void ShortenUrl_WithNonHttpScheme_ThrowsArgumentException(string uriString) {
         // Arrange
         Mock<IUrlMapDb> mockDb = new();
         UrlShortener urlShortener = new(mockDb.Object);
@@ -46,8 +42,7 @@ public class ShortenUrlTests
     [InlineData("https://example.com")]
     [InlineData("https://example.com/path?query=value")]
     [InlineData("https://subdomain.example.com:8080/path#fragment")]
-    public void ShortenUrl_WithValidUrl_ReturnsShortUrlAndSavesMapping(string uriString)
-    {
+    public void ShortenUrl_WithValidUrl_ReturnsShortUrlAndSavesMapping(string uriString) {
         // Arrange
         Mock<IUrlMapDb> mockDb = new();
         _ = mockDb.Setup(db => db.GetLongUrl(It.IsAny<string>())).Returns(string.Empty);
@@ -66,8 +61,7 @@ public class ShortenUrlTests
     }
 
     [Fact]
-    public void ShortenUrl_WithSameUrlCalledTwice_ReturnsSameShortUrl()
-    {
+    public void ShortenUrl_WithSameUrlCalledTwice_ReturnsSameShortUrl() {
         // Arrange
         Mock<IUrlMapDb> mockDb = new();
         _ = mockDb.Setup(db => db.GetLongUrl(It.IsAny<string>())).Returns(string.Empty);
@@ -83,8 +77,7 @@ public class ShortenUrlTests
     }
 
     [Fact]
-    public void ShortenUrl_WithDifferentUrls_GeneratesDifferentShortUrls()
-    {
+    public void ShortenUrl_WithDifferentUrls_GeneratesDifferentShortUrls() {
         // Arrange
         Mock<IUrlMapDb> mockDb = new();
         _ = mockDb.Setup(db => db.GetLongUrl(It.IsAny<string>())).Returns(string.Empty);
@@ -101,8 +94,7 @@ public class ShortenUrlTests
     [Theory]
     [InlineData("http://example.com", "http")]
     [InlineData("https://example.com", "https")]
-    public void ShortenUrl_PreservesSchemeFromOriginalUrl(string longUrlString, string expectedScheme)
-    {
+    public void ShortenUrl_PreservesSchemeFromOriginalUrl(string longUrlString, string expectedScheme) {
         // Arrange
         Mock<IUrlMapDb> mockDb = new();
         _ = mockDb.Setup(db => db.GetLongUrl(It.IsAny<string>())).Returns(string.Empty);
@@ -119,8 +111,7 @@ public class ShortenUrlTests
     [Theory]
     [InlineData("http://example.com")]
     [InlineData("https://secure.example.com")]
-    public void ShortenUrl_SavesOriginalSchemeInDatabase(string longUrlString)
-    {
+    public void ShortenUrl_SavesOriginalSchemeInDatabase(string longUrlString) {
         // Arrange
         Mock<IUrlMapDb> mockDb = new();
         _ = mockDb.Setup(db => db.GetLongUrl(It.IsAny<string>())).Returns(string.Empty);
@@ -138,8 +129,7 @@ public class ShortenUrlTests
     }
 
     [Fact]
-    public void ShortenUrl_WhenCollisionOccurs_GeneratesAlternativeShortUrl()
-    {
+    public void ShortenUrl_WhenCollisionOccurs_GeneratesAlternativeShortUrl() {
         // Arrange
         Mock<IUrlMapDb> mockDb = new();
         string existingLongUrl = "https://existing.com/";
@@ -161,8 +151,7 @@ public class ShortenUrlTests
     }
 
     [Fact]
-    public void ShortenUrl_WhenSameUrlAlreadyExists_DoesNotSaveDuplicate()
-    {
+    public void ShortenUrl_WhenSameUrlAlreadyExists_DoesNotSaveDuplicate() {
         // Arrange
         Mock<IUrlMapDb> mockDb = new();
         Uri longUrl = new("https://example.com/");
@@ -185,8 +174,7 @@ public class ShortenUrlTests
     }
 
     [Fact]
-    public void ShortenUrl_WhenCollisionOnFirstAttempt_ReturnsSameSaltedShortUrlOnRetry()
-    {
+    public void ShortenUrl_WhenCollisionOnFirstAttempt_ReturnsSameSaltedShortUrlOnRetry() {
         // Arrange
         Mock<IUrlMapDb> mockDb = new();
         Uri longUrl = new("https://example.com/");
@@ -214,8 +202,7 @@ public class ShortenUrlTests
     }
 
     [Fact]
-    public void ShortenUrl_WithUrlContainingSpecialCharacters_UsesOrdinalComparison()
-    {
+    public void ShortenUrl_WithUrlContainingSpecialCharacters_UsesOrdinalComparison() {
         // Arrange
         // This test demonstrates why StringComparison.Ordinal is necessary.
         // Real-world URLs can contain percent-encoded characters, Unicode paths, etc.
@@ -245,8 +232,7 @@ public class ShortenUrlTests
     }
 
     [Fact]
-    public void ShortenUrl_WithPathContainingMixedCase_PreservesExactCase()
-    {
+    public void ShortenUrl_WithPathContainingMixedCase_PreservesExactCase() {
         // Arrange
         // URLs are case-sensitive in the path component. This test ensures we use
         // Ordinal comparison which preserves case sensitivity.

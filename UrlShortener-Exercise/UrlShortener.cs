@@ -3,13 +3,11 @@ using System.Text;
 
 namespace Com.Example.UrlShortener_Exercise;
 
-public class UrlShortener(IUrlMapDb urlMapDb, UrlShortenerSettings? settings = null)
-{
+public class UrlShortener(IUrlMapDb urlMapDb, UrlShortenerSettings? settings = null) {
     private readonly IUrlMapDb _urlMapDb = urlMapDb ?? throw new ArgumentNullException(nameof(urlMapDb));
     private readonly UrlShortenerSettings _settings = settings ?? new UrlShortenerSettings();
 
-    public Uri ShortenUrl(Uri longUrl)
-    {
+    public Uri ShortenUrl(Uri longUrl) {
         ValidateLongUrl(longUrl);
 
         Uri shortUrl = GenerateUniqueShortUrl(longUrl);
@@ -18,8 +16,7 @@ public class UrlShortener(IUrlMapDb urlMapDb, UrlShortenerSettings? settings = n
         return shortUrl;
     }
 
-    private void ValidateLongUrl(Uri longUrl)
-    {
+    private void ValidateLongUrl(Uri longUrl) {
         ArgumentNullException.ThrowIfNull(longUrl, nameof(longUrl));
 
         if (!longUrl.IsAbsoluteUri)
@@ -43,8 +40,7 @@ public class UrlShortener(IUrlMapDb urlMapDb, UrlShortenerSettings? settings = n
             ?? throw new InvalidOperationException(
                 $"Unable to generate unique short URL after {_settings.MaxCollisionAttempts} attempts.");
 
-    private Uri GenerateShortUrlWithSalt(Uri longUrl, int salt)
-    {
+    private Uri GenerateShortUrlWithSalt(Uri longUrl, int salt) {
         string input = salt == 0
             ? longUrl.AbsoluteUri
             : $"{longUrl.AbsoluteUri}#{salt}";
@@ -64,29 +60,19 @@ public class UrlShortener(IUrlMapDb urlMapDb, UrlShortenerSettings? settings = n
     // Note: Deterministic hashing ensures the same long URL always generates the same short URL,
     // providing implicit idempotency without requiring a reverse lookup method in IUrlMapDb.
     // This keeps the interface simple while avoiding unnecessary database queries.
-    private bool IsShortUrlAvailable(Uri shortUrl, Uri originalLongUrl)
-    {
+    private bool IsShortUrlAvailable(Uri shortUrl, Uri originalLongUrl) {
         string existingLongUrl = _urlMapDb.GetLongUrl(shortUrl.AbsoluteUri);
         return string.IsNullOrEmpty(existingLongUrl)
             || existingLongUrl.Equals(originalLongUrl.AbsoluteUri, StringComparison.Ordinal);
     }
 
-    public Uri GetLongUrl(Uri shortUrl)
-    {
+    public Uri GetLongUrl(Uri shortUrl) {
         ArgumentNullException.ThrowIfNull(shortUrl, nameof(shortUrl));
-
         string longUrl = _urlMapDb.GetLongUrl(shortUrl.AbsoluteUri);
-
-        if (string.IsNullOrWhiteSpace(longUrl))
-        {
-            throw new ShortUrlNotFoundException(shortUrl.AbsoluteUri);
-        }
-
-        if (!Uri.TryCreate(longUrl, UriKind.Absolute, out Uri? uri))
-        {
-            throw new InvalidOperationException("Stored long URL is invalid.");
-        }
-
-        return new Uri(longUrl);
+        return string.IsNullOrWhiteSpace(longUrl)
+            ? throw new ShortUrlNotFoundException(shortUrl.AbsoluteUri)
+            : !Uri.TryCreate(longUrl, UriKind.Absolute, out _)
+                ? throw new InvalidOperationException("Stored long URL is invalid.")
+                : new Uri(longUrl);
     }
 }

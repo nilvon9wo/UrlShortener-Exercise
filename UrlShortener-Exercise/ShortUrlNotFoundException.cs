@@ -5,7 +5,6 @@ public class ShortUrlNotFoundException(
         string? message = null,
         Exception? innerException = null
     )
-    : Exception(message ?? $"Short URL '{shortUrl}' was not found.", innerException)
-{
+    : Exception(message ?? $"Short URL '{shortUrl}' was not found.", innerException) {
     public string ShortUrl { get; } = shortUrl;
 }
